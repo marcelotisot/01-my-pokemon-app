@@ -32,3 +32,11 @@ npm run test:cov
 ```bash
 npm run test:e2e
 ```
+
+
+### NOTAS GENERALES
+
+Al momento de hacer pruebas es mejor empezar por las piezas mas faciles de probar.
+EJEMPLO: app.module
+
+Es importante probar el app.module
