@@ -62,6 +62,11 @@ export class PokemonsService {
 
   private async getPokemonInformation(id: number): Promise<Pokemon> {
     const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+
+    if(response.status === 404) {
+      throw new NotFoundException(`Pokemon with id ${id} not found`);
+    }
+
     const data = (await response.json()) as PokeapiPokemonResponse;
 
     return {
