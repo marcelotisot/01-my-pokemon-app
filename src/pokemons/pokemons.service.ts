@@ -17,6 +17,7 @@ export class PokemonsService {
   }
 
   async findAll(paginationDto: PaginationDto): Promise<Pokemon[]> {
+    console.log('findAll llamado')
     const { limit = 10, page = 1 } = paginationDto; 
     const offset = (page - 1) * limit;
 
