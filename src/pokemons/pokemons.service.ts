@@ -21,7 +21,7 @@ export class PokemonsService {
     const offset = (page - 1) * limit;
 
     // Cache
-    const cacheKey = `${limit} - ${page}`;
+    const cacheKey = `${limit}-${page}`;
 
     if (this.paginatedPokemonsCache.has(cacheKey)) {
       return this.paginatedPokemonsCache.get(cacheKey)!;

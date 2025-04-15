@@ -53,4 +53,17 @@ describe('PokemonsService', () => {
     );
   });
 
+  it('should find all pokemons and cache them', async () => {
+
+    const pokemons = await service.findAll({ limit: 10, page: 1 });
+
+    // Verifica que sea la instancia de un arreglo
+    expect(pokemons).toBeInstanceOf(Array);
+
+    // Verifica que vengan 10 registros
+    expect(pokemons.length).toBe(10);
+    
+    expect(service.paginatedPokemonsCache.has('10-1')).toBeTruthy();
+    //expect(service.paginatedPokemonsCache.has('10-1')).toBe(pokemons);
+  });
 });
