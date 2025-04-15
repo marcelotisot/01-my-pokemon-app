@@ -53,6 +53,25 @@ describe('PokemonsService', () => {
     );
   });
 
+  it('should check properties of the pokemon', async () => {
+
+    const id = 4;
+    const pokemon = await service.findOne(id);
+    
+    // Verificar que existan las propiedades en la respuesta
+    expect(pokemon).toHaveProperty('id');
+    expect(pokemon).toHaveProperty('name');
+
+    // Verificar que la propiedad hp sea un numero
+    expect(pokemon).toEqual(
+      expect.objectContaining({
+        id: id,
+        hp: expect.any(Number), // Espera cualquier numero
+      })
+    );
+
+  });
+
   it('should find all pokemons and cache them', async () => {
 
     const pokemons = await service.findAll({ limit: 10, page: 1 });
