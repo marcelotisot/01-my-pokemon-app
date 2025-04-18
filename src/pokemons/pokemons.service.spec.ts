@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PokemonsService } from './pokemons.service';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('PokemonsService', () => {
   let service: PokemonsService;
@@ -25,7 +25,30 @@ describe('PokemonsService', () => {
 
     const result = await service.create(data);
 
-    expect(result).toBe(`This action adds a ${ data.name }`)
+    expect(result).toEqual({
+      hp: 0,
+      id: expect.any(Number),
+      name: 'Pikachu',
+      sprites: [],
+      type: 'Electric'
+    })
+  });
+
+  // Verificar el cache
+  it('should throw an error if pokemon exists', async () => {
+    const data = { name: 'Pikachu', type: 'Electric' };
+    await service.create(data);
+
+    try {
+      await service.create(data);
+      expect(true).toBeFalsy();
+    } catch (error) {
+      expect(error).toBeInstanceOf(BadRequestException);
+      expect(error.message).toBe(`Pokemon with name ${data.name} already exists`);
+    }
+    
+    // Asegurarnos que se va a recibir un BadRequestException
+    //await expect(service.create(data)).rejects.toThrow(BadRequestException);
   });
 
   // Verificar respuesta del metodo findOne
@@ -53,6 +76,17 @@ describe('PokemonsService', () => {
     );
   });
 
+  it('should return a pokemon from cache', async () => {
+    const cacheSpy = jest.spyOn(service.pokemonsCache, 'get');
+
+    const id = 1;
+
+    await service.findOne(id);
+    await service.findOne(id);
+
+    expect(cacheSpy).toHaveBeenCalledTimes(1);
+  });
+
   it('should check properties of the pokemon', async () => {
 
     const id = 4;
@@ -73,7 +107,6 @@ describe('PokemonsService', () => {
   });
 
   it('should find all pokemons and cache them', async () => {
-
     const pokemons = await service.findAll({ limit: 10, page: 1 });
 
     // Verifica que sea la instancia de un arreglo
@@ -84,5 +117,18 @@ describe('PokemonsService', () => {
     
     expect(service.paginatedPokemonsCache.has('10-1')).toBeTruthy();
     //expect(service.paginatedPokemonsCache.has('10-1')).toBe(pokemons);
+  });
+
+  it('should return pokemons from cache', async () => {
+    const cacheSpy = jest.spyOn(service.paginatedPokemonsCache, 'get');
+    const fetchSpy = jest.spyOn(global, 'fetch');
+
+    await service.findAll({ limit: 10, page: 1 });
+    await service.findAll({ limit: 10, page: 1 });
+
+    expect(cacheSpy).toHaveBeenCalledTimes(1);
+    expect(cacheSpy).toHaveBeenCalledWith('10-1');
+
+    expect(fetchSpy).toHaveBeenCalledTimes(11);
   });
 });
