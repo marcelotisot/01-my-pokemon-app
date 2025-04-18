@@ -81,10 +81,6 @@ export class PokemonsService {
   async update(id: number, updatePokemonDto: UpdatePokemonDto) {
     const pokemon = await this.findOne(id);
 
-    if (!pokemon) {
-      throw new BadRequestException(`Pokemon with id ${id} not found`);
-    }
-
     // Actualizar pokemon
     const updatedPokemon = {
       ...pokemon,
